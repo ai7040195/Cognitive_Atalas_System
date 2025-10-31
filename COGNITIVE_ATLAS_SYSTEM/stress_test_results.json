@@ -1,0 +1,12 @@
+{
+  "total_queries": 1078416,
+  "duration_minutes": 26.1,
+  "qps_final": 689.6,
+  "error_rate": 0.0,
+  "completion_percentage": 86.9,
+  "hardware": "Dell Latitude i5 + 4GB RAM",
+  "crash_time": "26.1 minutes",
+  "timestamp": "2025-10-31 13:11:31",
+  "queries_per_minute": 41318.62068965517,
+  "queries_per_hour": 2479117.24137931
+}
