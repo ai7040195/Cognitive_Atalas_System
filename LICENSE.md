@@ -1,11 +1,13 @@
-# ⚠️ IMPORTANT LEGAL NOTICE
+# ⚠️ LEGAL NOTICE
 
-This source code in this repository (ATLAS: Cognitive Ecosystem Zero-GPU) is currently **UNLICENSED**.
+This repository (ATLAS: Cognitive Ecosystem Zero-GPU) is provided **without any license**.  
+All rights are reserved by the author.
 
-It is provided **strictly for academic verification and Proof-of-Concept testing only.**
+The source code and associated materials are made available **exclusively for testing and academic case study purposes**.  
+No other use is permitted.
 
-Any commercial use, integration into commercial products, or creation of derivative works is **STRICTLY PROHIBITED** without explicit written consent from the author.
+Any form of commercial use — including but not limited to integration into commercial products, distribution, resale, or creation of derivative works — is **strictly prohibited** without **explicit written consent** from the author.
 
-This technology is subject to **IP-First design principles** as described on the associated LinkedIn posts.
+This technology is governed by **IP-First design principles**, as outlined in related LinkedIn communications.
 
-For commercial inquiries or partnership discussions, please contact the author via LinkedIn.
+For commercial inquiries, partnership discussions, or licensing requests, please contact the author directly via LinkedIn.
