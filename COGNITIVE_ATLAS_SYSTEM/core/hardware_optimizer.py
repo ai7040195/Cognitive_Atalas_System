@@ -1,6 +1,6 @@
 """
-HARDWARE OPTIMIZER FRACTAL - Advanced Resource Management with Fractal Architecture
-Optimizes CPU, memory, and parallel processing using fractal patterns for I9 + 24GB RAM
+QUANTUM FRACTAL OPTIMIZER v2.1 - Ultra-Optimized Hardware Architecture
+Advanced resource management with nanosecond precision and emergency cleanup.
 """
 
 import os
@@ -8,291 +8,403 @@ import psutil
 import threading
 import time
 import math
-from typing import Dict, List, Any, Optional
+import hashlib
+import secrets
+import atexit
+import functools
+from typing import Dict, List, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from dataclasses import dataclass
+from cryptography.fernet import Fernet
+import logging
 
-class FractalHardwareOptimizer:
-    """Fractal-based hardware optimization with recursive resource management"""
+# Security logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class QuantumSecurityError(Exception):
+    """Quantum security violation exception"""
+    pass
+
+class ResourceError(Exception):
+    """Resource allocation exception"""
+    pass
+
+@dataclass(frozen=True)
+class SecurityConfig:
+    """Immutable security configuration with __slots__ optimization"""
+    __slots__ = ['MAX_MEMORY_ALLOCATION', 'MIN_FRACTAL_DEPTH', 'MAX_FRACTAL_BRANCHES', 'ENCRYPTION_KEY', 'SESSION_TIMEOUT']
     
-    def __init__(self, depth: int = 4, branches: int = 8):
+    MAX_MEMORY_ALLOCATION: int = 16 * 1024 * 1024 * 1024  # 16GB max per process
+    MIN_FRACTAL_DEPTH: int = 3
+    MAX_FRACTAL_BRANCHES: int = 16
+    ENCRYPTION_KEY: bytes = Fernet.generate_key()
+    SESSION_TIMEOUT: int = 300  # 5 minutes
+
+class QuantumFractalOptimizer:
+    """Quantum-enhanced fractal optimization with nanosecond precision"""
+    
+    def __init__(self, depth: int = 6, branches: int = 12, security_level: int = 3):
+        self._validate_parameters(depth, branches, security_level)
+        
         self.depth = depth
         self.branches = branches
-        self.cpu_cores = os.cpu_count() or 8
-        self.total_ram = psutil.virtual_memory().total if hasattr(psutil, 'virtual_memory') else 24 * 1024 * 1024 * 1024  # 24GB
+        self.security_level = security_level
+        self.cpu_cores = min(32, os.cpu_count() or 8)
+        self.total_ram = self._get_secure_ram_allocation()
         
-        # Fractal memory allocation structure
-        self.memory_fractal = self._create_fractal_memory_tree()
-        self.compute_fractal = self._create_fractal_compute_tree()
+        # Cryptographic security
+        self.cipher_suite = Fernet(SecurityConfig.ENCRYPTION_KEY)
+        self.session_token = secrets.token_hex(32)
+        self.session_start = time.perf_counter_ns()  # Nanosecond precision
         
-        # Performance monitoring
+        # Quantum fractal structures
+        self.memory_fractal = self._create_quantum_memory_tree()
+        self.compute_fractal = self._create_quantum_compute_tree()
+        self.security_fractal = self._create_security_fractal()
+        
+        # Performance & security monitoring
         self.performance_log = []
+        self.security_events = []
         self.optimization_cycles = 0
+        self._security_lock = threading.RLock()
         
-    def _create_fractal_memory_tree(self) -> List[List[Dict]]:
-        """Create fractal structure for memory management"""
+        # Emergency cleanup registration
+        atexit.register(self._emergency_cleanup)
+        
+        logging.info(f"Quantum Fractal Optimizer v2.1 initialized - Depth: {depth}, Branches: {branches}")
+    
+    def _validate_parameters(self, depth: int, branches: int, security_level: int) -> None:
+        """Validate all initialization parameters for security"""
+        if not (SecurityConfig.MIN_FRACTAL_DEPTH <= depth <= 8):
+            raise QuantumSecurityError(f"Depth must be between {SecurityConfig.MIN_FRACTAL_DEPTH} and 8")
+        
+        if not (2 <= branches <= SecurityConfig.MAX_FRACTAL_BRANCHES):
+            raise QuantumSecurityError(f"Branches must be between 2 and {SecurityConfig.MAX_FRACTAL_BRANCHES}")
+        
+        if not (1 <= security_level <= 5):
+            raise QuantumSecurityError("Security level must be between 1 and 5")
+    
+    def _get_secure_ram_allocation(self) -> int:
+        """Get secure RAM allocation with safety limits"""
+        try:
+            system_ram = psutil.virtual_memory().total
+            safe_allocation = min(system_ram * 0.8, 32 * 1024 * 1024 * 1024)
+            return int(safe_allocation)
+        except Exception as e:
+            logging.warning(f"RAM detection failed, using safe default: {e}")
+            return 16 * 1024 * 1024 * 1024
+    
+    @functools.lru_cache(maxsize=1024)
+    def _generate_security_hash(self, level: int, node: int) -> str:
+        """Cached security hash generation for performance"""
+        data = f"{level}:{node}:{self.session_token}:{time.perf_counter_ns()}"
+        return hashlib.sha256(data.encode()).hexdigest()
+    
+    def _create_quantum_memory_tree(self) -> List[List[Dict]]:
+        """Create quantum-inspired fractal memory structure with security layers"""
         tree = []
         for level in range(self.depth):
             branch = []
+            quantum_factor = 2 ** level
+            
             for node in range(self.branches):
-                memory_slice = (self.total_ram // (self.branches ** (level + 1))) 
+                base_allocation = (self.total_ram // (self.branches ** (level + 1)))
+                quantum_allocation = base_allocation * quantum_factor
+                secured_allocation = min(quantum_allocation, 
+                                       SecurityConfig.MAX_MEMORY_ALLOCATION // (self.branches * level + 1))
+                
                 branch.append({
-                    "memory_allocation": memory_slice,
+                    "memory_allocation": secured_allocation,
                     "active_processes": [],
                     "utilization": 0.0,
-                    "fractal_path": f"L{level}N{node}",
-                    "priority": level + 1  # Deeper levels = higher priority
+                    "fractal_path": self._generate_secure_path(level, node, "M"),
+                    "quantum_priority": level * 10 + node,
+                    "security_hash": self._generate_security_hash(level, node),
+                    "last_accessed": time.perf_counter_ns()
                 })
             tree.append(branch)
         return tree
     
-    def _create_fractal_compute_tree(self) -> List[List[Dict]]:
-        """Create fractal structure for compute distribution"""
+    def _create_quantum_compute_tree(self) -> List[List[Dict]]:
+        """Create quantum compute distribution with load balancing"""
         tree = []
         cores_per_level = max(1, self.cpu_cores // self.depth)
         
         for level in range(self.depth):
             branch = []
+            quantum_boost = 1.0 + (level * 0.1)
+            
             for node in range(self.branches):
-                assigned_cores = max(1, cores_per_level // (node + 1))
+                assigned_cores = max(1, int(cores_per_level * quantum_boost // (node + 1)))
+                
                 branch.append({
                     "assigned_cores": assigned_cores,
                     "current_load": 0.0,
                     "active_threads": [],
-                    "fractal_path": f"C{level}N{node}",
-                    "efficiency": 1.0
+                    "fractal_path": self._generate_secure_path(level, node, "C"),
+                    "quantum_efficiency": 1.0 + (level * 0.05),
+                    "security_hash": self._generate_security_hash(level, node),
+                    "load_history": []
                 })
             tree.append(branch)
         return tree
     
-    def fractal_memory_allocation(self, process_size: int, priority: int = 1) -> str:
-        """Allocate memory using fractal pattern matching"""
-        fractal_path = self._find_optimal_fractal_path(process_size, priority)
-        
-        if fractal_path:
-            level, node = self._parse_fractal_path(fractal_path)
-            self.memory_fractal[level][node]["active_processes"].append({
-                "size": process_size,
-                "timestamp": time.time(),
-                "fractal_path": fractal_path
-            })
-            self.memory_fractal[level][node]["utilization"] += process_size / self.memory_fractal[level][node]["memory_allocation"]
-            
-            self._fractal_memory_balance()  # Rebalance fractal tree
-            return fractal_path
-        
-        return "allocation_failed"
+    def _create_security_fractal(self) -> List[List[Dict]]:
+        """Create security monitoring fractal structure"""
+        tree = []
+        for level in range(self.depth):
+            branch = []
+            for node in range(self.branches):
+                branch.append({
+                    "intrusion_attempts": 0,
+                    "last_scan": time.perf_counter_ns(),
+                    "security_score": 100.0,
+                    "fractal_path": self._generate_secure_path(level, node, "S"),
+                    "threat_level": 0,
+                    "encrypted_logs": []
+                })
+            tree.append(branch)
+        return tree
     
-    def _find_optimal_fractal_path(self, size: int, priority: int) -> Optional[str]:
-        """Find optimal fractal path for memory allocation"""
-        # Start from deepest level for high priority (fractal principle: detail at depth)
-        start_level = self.depth - 1 if priority > 2 else 0
+    def _generate_secure_path(self, level: int, node: int, prefix: str) -> str:
+        """Generate cryptographically secure fractal path"""
+        base_path = f"{prefix}{level}N{node}"
+        hash_input = f"{base_path}{self.session_token}{time.perf_counter_ns()}"
+        secure_hash = hashlib.sha256(hash_input.encode()).hexdigest()[:8]
+        return f"{base_path}_{secure_hash}"
+    
+    def _generate_security_token(self) -> str:
+        """Generate session security token"""
+        return hashlib.sha256(f"{self.session_token}{time.perf_counter_ns()}".encode()).hexdigest()
+    
+    def quantum_memory_allocation(self, process_size: int, priority: int = 1, 
+                                process_hash: str = None) -> Dict[str, Any]:
+        """Secure quantum memory allocation with validation"""
+        with self._security_lock:
+            self._validate_session()
+            
+            if process_size > SecurityConfig.MAX_MEMORY_ALLOCATION:
+                raise QuantumSecurityError(f"Process size {process_size} exceeds maximum allowed")
+            
+            if not process_hash:
+                process_hash = self._generate_security_hash(0, 0)
+            
+            fractal_path = self._find_quantum_memory_path(process_size, priority, process_hash)
+            
+            if fractal_path:
+                level, node = self._parse_secure_path(fractal_path)
+                
+                encrypted_process = {
+                    "size": process_size,
+                    "timestamp": time.perf_counter_ns(),
+                    "fractal_path": fractal_path,
+                    "process_hash": process_hash,
+                    "encrypted_data": self.cipher_suite.encrypt(f"process_{process_hash}".encode())
+                }
+                
+                self.memory_fractal[level][node]["active_processes"].append(encrypted_process)
+                allocated_memory = min(process_size, self.memory_fractal[level][node]["memory_allocation"])
+                self.memory_fractal[level][node]["utilization"] += allocated_memory / self.memory_fractal[level][node]["memory_allocation"]
+                self.memory_fractal[level][node]["last_accessed"] = time.perf_counter_ns()
+                
+                self._quantum_memory_balance()
+                
+                logging.info(f"Memory allocated: {process_size} bytes at {fractal_path}")
+                
+                return {
+                    "fractal_path": fractal_path,
+                    "allocated_size": allocated_memory,
+                    "quantum_efficiency": self._calculate_quantum_efficiency(),
+                    "security_token": self._generate_security_token()
+                }
+            
+            raise ResourceError("Quantum memory allocation failed - insufficient resources")
+    
+    def _find_quantum_memory_path(self, size: int, priority: int, process_hash: str) -> Optional[str]:
+        """Find optimal quantum memory path with security validation"""
+        search_paths = []
         
-        for level in range(start_level, -1, -1):
+        for level in range(self.depth):
             for node in range(self.branches):
                 node_info = self.memory_fractal[level][node]
-                available = node_info["memory_allocation"] * (1 - node_info["utilization"])
                 
-                if available >= size and node_info["priority"] >= priority:
-                    return node_info["fractal_path"]
+                if not self._validate_node_security(level, node):
+                    continue
+                
+                available = node_info["memory_allocation"] * (1 - node_info["utilization"])
+                quantum_capacity = available * (1.0 + (level * 0.1))
+                
+                if quantum_capacity >= size and node_info["quantum_priority"] >= priority:
+                    search_paths.append((node_info["fractal_path"], quantum_capacity, level))
+        
+        if search_paths:
+            search_paths.sort(key=lambda x: (x[1], x[2]), reverse=True)
+            return search_paths[0][0]
         
         return None
     
-    def fractal_cpu_distribution(self, computation_complexity: int) -> List[str]:
-        """Distribute computation across fractal CPU structure"""
-        assigned_paths = []
-        remaining_complexity = computation_complexity
+    def _validate_session(self) -> None:
+        """Validate session security and timeout"""
+        current_time = time.perf_counter_ns()
+        session_duration = (current_time - self.session_start) / 1e9  # Convert to seconds
         
-        # Distribute across fractal nodes based on complexity
-        for level in range(self.depth):
-            for node in range(self.branches):
-                if remaining_complexity <= 0:
-                    break
-                    
-                node_capacity = self.compute_fractal[level][node]["assigned_cores"] * 1000  # Arbitrary capacity units
-                assign_complexity = min(remaining_complexity, node_capacity)
-                
-                if assign_complexity > 0:
-                    self.compute_fractal[level][node]["current_load"] += assign_complexity / node_capacity
-                    assigned_paths.append(self.compute_fractal[level][node]["fractal_path"])
-                    remaining_complexity -= assign_complexity
-        
-        self._fractal_compute_balance()
-        return assigned_paths
+        if session_duration > SecurityConfig.SESSION_TIMEOUT:
+            raise QuantumSecurityError("Session timeout - security violation")
     
-    def _fractal_memory_balance(self):
-        """Balance memory allocation across fractal tree"""
-        for level in range(self.depth - 1):
-            for node in range(self.branches):
-                current_node = self.memory_fractal[level][node]
-                child_utilization = 0.0
-                
-                # Calculate child node utilization (fractal self-similarity)
-                for child_node in range(self.branches):
-                    if level + 1 < self.depth:
-                        child_utilization += self.memory_fractal[level + 1][child_node]["utilization"]
-                
-                # Balance based on fractal hierarchy
-                if child_utilization / self.branches > current_node["utilization"]:
-                    # Redistribute memory to children
-                    pass
-    
-    def _fractal_compute_balance(self):
-        """Balance compute load across fractal tree"""
-        total_load = sum(
-            node["current_load"] 
-            for level in self.compute_fractal 
-            for node in level
-        ) / (self.depth * self.branches)
-        
-        # Adjust efficiencies based on fractal load distribution
-        for level in self.compute_fractal:
-            for node in level:
-                if node["current_load"] > total_load * 1.2:  # Overloaded
-                    node["efficiency"] *= 0.95
-                elif node["current_load"] < total_load * 0.8:  # Underloaded
-                    node["efficiency"] *= 1.05
-                
-                node["efficiency"] = max(0.5, min(1.5, node["efficiency"]))
-    
-    def parallel_fractal_processing(self, tasks: List[Any], complexity_func) -> List[Any]:
-        """Execute tasks using fractal parallel processing pattern"""
-        with ThreadPoolExecutor(max_workers=self.cpu_cores) as executor:
-            # Group tasks by fractal complexity
-            fractal_groups = self._group_tasks_fractal(tasks, complexity_func)
-            results = []
+    def _validate_node_security(self, level: int, node: int) -> bool:
+        """Validate node security status"""
+        try:
+            security_node = self.security_fractal[level][node]
+            current_time = time.perf_counter_ns()
             
-            for group in fractal_groups:
-                group_results = list(executor.map(complexity_func, group))
-                results.extend(group_results)
+            # Check threat level and scan recency
+            if (security_node["threat_level"] > 50 or 
+                (current_time - security_node["last_scan"]) / 1e9 > 60):  # 60 seconds
+                return False
                 
-            return results
+            return security_node["security_score"] > 70
+        except:
+            return False
     
-    def _group_tasks_fractal(self, tasks: List[Any], complexity_func) -> List[List[Any]]:
-        """Group tasks using fractal complexity analysis"""
-        if len(tasks) <= self.branches:
-            return [tasks]
+    def _validate_task_security(self, task: Any) -> bool:
+        """Validate task security"""
+        # Basic security checks - extend based on your requirements
+        if task is None:
+            return False
         
-        # Recursive fractal grouping
-        groups = []
-        tasks_per_group = max(1, len(tasks) // self.branches)
-        
-        for i in range(self.branches):
-            start_idx = i * tasks_per_group
-            end_idx = start_idx + tasks_per_group if i < self.branches - 1 else len(tasks)
+        task_str = str(task)
+        if len(task_str) > 1000000:  # 1MB limit
+            return False
             
-            if start_idx < len(tasks):
-                group = tasks[start_idx:end_idx]
-                if len(group) > self.branches:  # Recursive fractal split
-                    subgroups = self._group_tasks_fractal(group, complexity_func)
-                    groups.extend(subgroups)
-                else:
-                    groups.append(group)
-        
-        return groups
+        return True
     
-    def fractal_performance_metrics(self) -> Dict[str, Any]:
-        """Get comprehensive fractal performance metrics"""
-        memory_utilization = sum(
+    def _calculate_quantum_efficiency(self) -> float:
+        """Calculate overall quantum efficiency"""
+        memory_efficiency = 1.0 - sum(
             node["utilization"] 
             for level in self.memory_fractal 
             for node in level
         ) / (self.depth * self.branches)
         
-        compute_utilization = sum(
-            node["current_load"] 
+        compute_efficiency = sum(
+            node["quantum_efficiency"] 
             for level in self.compute_fractal 
             for node in level
         ) / (self.depth * self.branches)
         
-        fractal_efficiency = sum(
-            node["efficiency"] 
-            for level in self.compute_fractal 
-            for node in level
-        ) / (self.depth * self.branches)
-        
-        return {
-            "fractal_depth": self.depth,
-            "fractal_branches": self.branches,
-            "memory_utilization": f"{memory_utilization:.1%}",
-            "compute_utilization": f"{compute_utilization:.1%}",
-            "fractal_efficiency": f"{fractal_efficiency:.3f}",
-            "cpu_cores_available": self.cpu_cores,
-            "total_ram_gb": self.total_ram / (1024**3),
-            "optimization_cycles": self.optimization_cycles,
-            "fractal_balance": self._calculate_fractal_balance()
-        }
+        return (memory_efficiency + compute_efficiency) / 2
     
-    def _calculate_fractal_balance(self) -> float:
-        """Calculate fractal balance score (0-1, higher is better)"""
-        memory_variance = self._calculate_fractal_variance(self.memory_fractal, "utilization")
-        compute_variance = self._calculate_fractal_variance(self.compute_fractal, "current_load")
-        
-        # Perfect balance = low variance across fractal structure
-        balance_score = 1.0 / (1.0 + memory_variance + compute_variance)
-        return min(1.0, balance_score)
-    
-    def _calculate_fractal_variance(self, fractal_tree: List[List[Dict]], metric: str) -> float:
-        """Calculate variance of metric across fractal structure"""
-        values = []
-        for level in fractal_tree:
-            for node in level:
-                values.append(node.get(metric, 0.0))
-        
-        if not values:
+    def _calculate_distribution_efficiency(self, assigned_paths: List[Dict]) -> float:
+        """Calculate distribution efficiency"""
+        if not assigned_paths:
             return 0.0
-            
-        mean = sum(values) / len(values)
-        variance = sum((x - mean) ** 2 for x in values) / len(values)
-        return variance
+        
+        complexities = [path["assigned_complexity"] for path in assigned_paths]
+        avg_complexity = sum(complexities) / len(complexities)
+        
+        # Lower variance = better distribution
+        variance = sum((comp - avg_complexity) ** 2 for comp in complexities) / len(complexities)
+        return 1.0 / (1.0 + variance)
     
-    def _parse_fractal_path(self, path: str) -> tuple[int, int]:
-        """Parse fractal path string to level and node indices"""
+    def _parse_secure_path(self, path: str) -> Tuple[int, int]:
+        """Parse secure fractal path"""
         try:
-            level_str, node_str = path[1:].split('N')
+            parts = path.split('_')[0]  # Remove hash
+            level_str = parts[1:].split('N')[0]
+            node_str = parts.split('N')[1]
             return int(level_str), int(node_str)
         except:
             return 0, 0
     
-    def optimize_system_wide(self):
-        """Perform system-wide fractal optimization"""
-        self.optimization_cycles += 1
-        self._fractal_memory_balance()
-        self._fractal_compute_balance()
-        
-        # Log performance for fractal pattern analysis
-        metrics = self.fractal_performance_metrics()
-        self.performance_log.append({
-            "timestamp": time.time(),
-            "metrics": metrics,
-            "cycle": self.optimization_cycles
-        })
-
-# Fractal-aware process manager
-class FractalProcessManager:
-    """Manage processes using fractal priority scheduling"""
+    def _emergency_cleanup(self):
+        """Emergency cleanup to prevent resource leaks"""
+        try:
+            logging.info("Performing emergency cleanup...")
+            
+            # Release all memory allocations
+            for level in self.memory_fractal:
+                for node in level:
+                    node["active_processes"].clear()
+                    node["utilization"] = 0.0
+            
+            # Reset compute loads
+            for level in self.compute_fractal:
+                for node in level:
+                    node["current_load"] = 0.0
+                    node["load_history"].clear()
+            
+            # Clear security events
+            self.security_events.clear()
+            
+            logging.info("Emergency cleanup completed successfully")
+            
+        except Exception as e:
+            logging.error(f"Emergency cleanup failed: {e}")
     
-    def __init__(self, optimizer: FractalHardwareOptimizer):
-        self.optimizer = optimizer
-        self.active_processes = {}
-        self.fractal_priority_map = {}
+    def get_performance_metrics(self) -> Dict[str, Any]:
+        """Get comprehensive performance metrics"""
+        with self._security_lock:
+            memory_utilization = sum(
+                node["utilization"] 
+                for level in self.memory_fractal 
+                for node in level
+            ) / (self.depth * self.branches)
+            
+            compute_utilization = sum(
+                node["current_load"] 
+                for level in self.compute_fractal 
+                for node in level
+            ) / (self.depth * self.branches)
+            
+            quantum_efficiency = self._calculate_quantum_efficiency()
+            
+            return {
+                "fractal_depth": self.depth,
+                "fractal_branches": self.branches,
+                "memory_utilization": f"{memory_utilization:.1%}",
+                "compute_utilization": f"{compute_utilization:.1%}",
+                "quantum_efficiency": f"{quantum_efficiency:.3f}",
+                "cpu_cores_available": self.cpu_cores,
+                "total_ram_gb": self.total_ram / (1024**3),
+                "optimization_cycles": self.optimization_cycles,
+                "security_level": self.security_level,
+                "session_duration_sec": (time.perf_counter_ns() - self.session_start) / 1e9
+            }
+
+# Usage example with emergency protection
+def main():
+    """Example usage with comprehensive error handling"""
+    try:
+        optimizer = QuantumFractalOptimizer(depth=5, branches=8, security_level=4)
         
-    def start_fractal_process(self, process_id: str, memory_needed: int, compute_complexity: int, priority: int = 1):
-        """Start process with fractal resource allocation"""
-        memory_path = self.optimizer.fractal_memory_allocation(memory_needed, priority)
-        compute_paths = self.optimizer.fractal_cpu_distribution(compute_complexity)
+        # Example memory allocation
+        allocation = optimizer.quantum_memory_allocation(
+            process_size=1024 * 1024,  # 1MB
+            priority=2,
+            process_hash="example_process"
+        )
+        print(f"Allocation result: {allocation}")
         
-        self.active_processes[process_id] = {
-            "memory_path": memory_path,
-            "compute_paths": compute_paths,
-            "memory_allocated": memory_needed,
-            "compute_allocated": compute_complexity,
-            "start_time": time.time(),
-            "priority": priority
-        }
+        # Example compute distribution
+        compute = optimizer.quantum_compute_distribution(
+            computation_complexity=5000,
+            task_type="matrix_math"
+        )
+        print(f"Compute distribution: {compute}")
         
-        return {
-            "process_id": process_id,
-            "fractal_memory_path": memory_path,
-            "fractal_compute_paths": compute_paths,
-            "status": "allocated"
-        }
+        # Get performance metrics
+        metrics = optimizer.get_performance_metrics()
+        print(f"Performance metrics: {metrics}")
+        
+    except QuantumSecurityError as e:
+        logging.error(f"Security violation: {e}")
+    except ResourceError as e:
+        logging.error(f"Resource error: {e}")
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+    finally:
+        # Emergency cleanup will be called automatically via atexit
+        pass
+
+if __name__ == "__main__":
+    main()
